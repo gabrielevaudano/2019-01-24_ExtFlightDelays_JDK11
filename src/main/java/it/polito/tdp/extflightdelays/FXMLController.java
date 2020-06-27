@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.extflightdelays.model.Model;
+import it.polito.tdp.extflightdelays.model.StringWithVeivoli;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -28,7 +29,7 @@ public class FXMLController {
     private Button btnCreaGrafo;
 
     @FXML
-    private ComboBox<?> cmbBoxStati;
+    private ComboBox<String> cmbBoxStati;
 
     @FXML
     private Button btnVisualizzaVelivoli;
@@ -44,17 +45,39 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	try {
+    		model.creaGrafo();
+    		txtResult.setText(String.format("Il grafo è stato creato. Contiene %d vertici e %d archi", model.getGrafo().vertexSet().size(), model.getGrafo().edgeSet().size()));
+    		cmbBoxStati.getItems().clear();
+    		cmbBoxStati.getItems().addAll(model.getGrafo().vertexSet());
+    		
+    	} catch (Exception e) {
+    		txtResult.setText(e.getMessage());
+    	}
     }
 
     @FXML
     void doSimula(ActionEvent event) {
-
+    	txtResult.clear();
+    	
+    	try {
+    		for (StringWithVeivoli w : model.visualizzaVeivoli(cmbBoxStati.getSelectionModel().getSelectedItem()))
+    			txtResult.appendText(w + "\n");
+    	} catch (Exception e) {
+    		txtResult.setText(e.getMessage());
+    	}
     }
 
     @FXML
     void doVisualizzaVelivoli(ActionEvent event) {
-
+    	txtResult.clear();
+    	
+    	try {
+    		for (StringWithVeivoli w : model.visualizzaVeivoli(cmbBoxStati.getSelectionModel().getSelectedItem()))
+    			txtResult.appendText(w + "\n");
+    	} catch (Exception e) {
+    		txtResult.setText(e.getMessage());
+    	}
     }
 
     @FXML

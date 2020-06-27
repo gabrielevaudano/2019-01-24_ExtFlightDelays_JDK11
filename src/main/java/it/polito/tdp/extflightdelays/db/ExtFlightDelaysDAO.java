@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import it.polito.tdp.extflightdelays.model.Adiacenza;
 import it.polito.tdp.extflightdelays.model.Airline;
 import it.polito.tdp.extflightdelays.model.Airport;
 import it.polito.tdp.extflightdelays.model.Flight;
@@ -86,7 +88,57 @@ public class ExtFlightDelaysDAO {
 		}
 	}
 	
+	public List<String> loadVertices(Set<String> idMapstates) {
+		String sql = "SELECT distinct(STATE) from airports WHERE country = 'USA' ";
+		List<String> result = new ArrayList<String>();
 
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(rs.getString("STATE"));
+				idMapstates.add(rs.getString("STATE"));
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public List<Adiacenza> loadAdiacenze(Set<String> states) {
+		String sql = "SELECT a1.STATE, a2.STATE, COUNT(DISTINCT f1.TAIL_NUMBER) weight " + 
+				"FROM airports a1, airports a2, flights f1 " + 
+				"WHERE a1.ID = f1.ORIGIN_AIRPORT_ID AND a2.ID = f1.DESTINATION_AIRPORT_ID " + 
+				"GROUP BY a1.STATE, a2.STATE ";
+		List<Adiacenza> result = new ArrayList<Adiacenza>();
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				if (states.contains(rs.getString("a2.STATE")) && states.contains(rs.getString("a1.STATE")))
+					result.add(new Adiacenza(rs.getString("a1.STATE"), rs.getString("a2.STATE"), rs.getInt("weight")));
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
 	public List<Flight> loadAllFlights() {
 		String sql = "SELECT * FROM flights";
 		List<Flight> result = new LinkedList<Flight>();
