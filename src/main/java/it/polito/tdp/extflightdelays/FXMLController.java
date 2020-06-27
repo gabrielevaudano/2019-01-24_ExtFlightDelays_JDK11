@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.extflightdelays.model.Model;
+import it.polito.tdp.extflightdelays.model.StateWithTourists;
 import it.polito.tdp.extflightdelays.model.StringWithVeivoli;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -61,8 +62,17 @@ public class FXMLController {
     	txtResult.clear();
     	
     	try {
-    		for (StringWithVeivoli w : model.visualizzaVeivoli(cmbBoxStati.getSelectionModel().getSelectedItem()))
-    			txtResult.appendText(w + "\n");
+    		int time = Integer.parseInt(txtG.getText());
+    		int tourists = Integer.parseInt(txtT.getText());
+    		String partenza = cmbBoxStati.getSelectionModel().getSelectedItem();
+    		
+    		if (partenza == null)
+    			throw new NullPointerException("Nessun stato selezionato.");
+    		
+    		txtResult.setText("Il risultato della simulazione è:\n");
+    		
+    		for (StateWithTourists a : model.getTourists(time, tourists, partenza))
+    			txtResult.appendText(String.format("%s\t%d\n", a.getState(), a.getTourists()));
     	} catch (Exception e) {
     		txtResult.setText(e.getMessage());
     	}

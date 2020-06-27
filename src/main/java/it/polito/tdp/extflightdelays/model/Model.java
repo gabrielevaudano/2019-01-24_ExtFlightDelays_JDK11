@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.Graph;
@@ -59,4 +60,17 @@ public class Model {
 		return swv;
 	}
 	
+	public List<StateWithTourists> getTourists(int time, int people, String partenza) {
+		Simulator m = new Simulator();
+		List<StateWithTourists> list = new ArrayList<StateWithTourists>();
+		Map<String, Integer> mappa = m.getStateTourists();
+		
+		m.init(grafo, partenza, time, people);
+		m.run();
+		
+		for (String key : mappa.keySet())
+			list.add(new StateWithTourists(key, mappa.get(key)));
+		
+		return list;
+	}
 }
